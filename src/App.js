@@ -9,7 +9,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for Sunday..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for reminder..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -23,18 +23,15 @@ export default function App() {
   useEffect(() => {
     function updateCountdown() {
       const now = new Date();
-      const day = now.getDay();
-      const daysUntil = day === 0 ? 0 : 7 - day;
-      const nextSunday = new Date(now);
-      nextSunday.setDate(now.getDate() + daysUntil);
-      nextSunday.setHours(10, 0, 0, 0);
-      if (nextSunday < now) nextSunday.setDate(nextSunday.getDate() + 7);
-      const diff = nextSunday - now;
+      const target = new Date();
+      target.setHours(17, 34, 0, 0);
+      if (target < now) target.setDate(target.getDate() + 1);
+      const diff = target - now;
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot(day === 0 ? "TODAY — running from 10AM!" : `Next Sunday — ${nextSunday.toLocaleDateString("en-IN", { month: "short", day: "numeric" })}`);
+      setNextSlot("Today at 5:34 PM");
     }
     updateCountdown();
     const t = setInterval(updateCountdown, 1000);
@@ -45,11 +42,11 @@ export default function App() {
     async function checkAndFire() {
       if (!active) return;
       const now = new Date();
-      if (now.getDay() !== 0) return;
+      if (now.getDay() !== 3) return;
       const hour = now.getHours();
       const min = now.getMinutes();
-      if (hour >= 10 && hour <= 13 && min < 2) {
-        const slot = hour - 10;
+      if (hour === 17 && min === 34) {
+        const slot = 0;
         if (slotRef.current <= slot) {
           slotRef.current = slot + 1;
           await fireReminder(slot);
@@ -130,8 +127,8 @@ export default function App() {
         </div>
 
         <div style={s.card}>
-          <div style={s.label}>📅 Sunday Schedule</div>
-          {[["10:00 AM","SMS + Email 📧"],["11:00 AM","SMS 💬"],["12:00 PM","SMS + Call 📞"],["01:00 PM","SMS + Call 📞"]].map(([t,w])=>(
+          <div style={s.label}>📅 Test Schedule</div>
+          {[["5:34 PM","SMS + Email 📧"]].map(([t,w])=>(
             <div key={t} style={s.row}><span style={{color:"#fff",fontWeight:"500"}}>{t}</span><span style={{color:"#888"}}>{w}</span></div>
           ))}
           <div style={{fontSize:"11px",color:"#444",marginTop:"10px"}}>Auto-stops when she replies DONE to SMS</div>
@@ -153,7 +150,7 @@ export default function App() {
         </div>
 
         <div style={{textAlign:"center",fontSize:"11px",color:"#333",paddingBottom:"24px"}}>
-          ⚠️ Keep this tab open on Sunday for auto-reminders • Built with love 💕
+          ⚠️ Keep this tab open for auto-reminder at 5:34 PM • Built with love 💕
         </div>
       </div>
     </div>
