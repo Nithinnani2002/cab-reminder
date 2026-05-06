@@ -9,7 +9,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for reminder..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 6:00 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -24,14 +24,18 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(17, 42, 0, 0);
-      if (target < now) target.setDate(target.getDate() + 1);
+      target.setHours(18, 0, 0, 0);
+      if (target < now) {
+        setCountdown("⏰ Time passed!");
+        setNextSlot("Reminder already fired or missed");
+        return;
+      }
       const diff = target - now;
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today at 5:42 PM");
+      setNextSlot("Today — 6:00 PM");
     }
     updateCountdown();
     const t = setInterval(updateCountdown, 1000);
@@ -42,42 +46,47 @@ export default function App() {
     async function checkAndFire() {
       if (!active) return;
       const now = new Date();
-      if (now.getDay() !== 3) return;
       const hour = now.getHours();
       const min = now.getMinutes();
-      if (hour === 17 && min === 42) {
-        const slot = 0;
-        if (slotRef.current <= slot) {
-          slotRef.current = slot + 1;
-          await fireReminder(slot);
+      if (hour === 18 && min === 0) {
+        if (slotRef.current === 0) {
+          slotRef.current = 1;
+          await fireReminder(0);
         }
       }
     }
-    const t = setInterval(checkAndFire, 60000);
+    const t = setInterval(checkAndFire, 10000); // checks every 10 sec so it doesn't miss
     return () => clearInterval(t);
   }, [active]);
 
   async function fireReminder(slot) {
     const msg = SMS_MESSAGES[Math.min(slot, SMS_MESSAGES.length - 1)];
-    addLog(`🚀 Firing reminder ${slot + 1}/4...`);
+    addLog(`🚀 Firing reminder...`);
+
+    // SMS
     try {
-      const r = await fetch("/api/sms", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: msg }) });
+      const r = await fetch("/api/sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
       const d = await r.json();
       addLog(d.ok ? "✅ SMS sent!" : "❌ SMS failed: " + d.error);
-    } catch (e) { addLog("❌ SMS error: " + e.message); }
-    if (slot >= 2) {
-      try {
-        const r = await fetch("/api/call", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-        const d = await r.json();
-        addLog(d.ok ? "✅ Call initiated!" : "❌ Call failed: " + d.error);
-      } catch (e) { addLog("❌ Call error: " + e.message); }
+    } catch (e) {
+      addLog("❌ SMS error: " + e.message);
     }
-    if (slot === 0) {
-      try {
-        const r = await fetch("/api/email", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-        const d = await r.json();
-        addLog(d.ok ? "✅ Email sent!" : "❌ Email failed: " + d.error);
-      } catch (e) { addLog("❌ Email error: " + e.message); }
+
+    // Email
+    try {
+      const r = await fetch("/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const d = await r.json();
+      addLog(d.ok ? "✅ Email sent!" : "❌ Email failed: " + d.error);
+    } catch (e) {
+      addLog("❌ Email error: " + e.message);
     }
   }
 
@@ -127,11 +136,12 @@ export default function App() {
         </div>
 
         <div style={s.card}>
-          <div style={s.label}>📅 Test Schedule</div>
-          {[["5:34 PM","SMS + Email 📧"]].map(([t,w])=>(
-            <div key={t} style={s.row}><span style={{color:"#fff",fontWeight:"500"}}>{t}</span><span style={{color:"#888"}}>{w}</span></div>
-          ))}
-          <div style={{fontSize:"11px",color:"#444",marginTop:"10px"}}>Auto-stops when she replies DONE to SMS</div>
+          <div style={s.label}>📅 Today's Schedule</div>
+          <div style={s.row}>
+            <span style={{ color: "#fff", fontWeight: "500" }}>6:00 PM</span>
+            <span style={{ color: "#888" }}>SMS + Email 📧</span>
+          </div>
+          <div style={{ fontSize: "11px", color: "#444", marginTop: "10px" }}>⚠️ Keep this tab open!</div>
         </div>
 
         <div style={s.card}>
@@ -146,11 +156,11 @@ export default function App() {
 
         <div style={s.card}>
           <div style={s.label}>📋 Activity Log</div>
-          {log.map((e,i)=><div key={i} style={s.logLine}>{e}</div>)}
+          {log.map((e, i) => <div key={i} style={s.logLine}>{e}</div>)}
         </div>
 
-        <div style={{textAlign:"center",fontSize:"11px",color:"#333",paddingBottom:"24px"}}>
-          ⚠️ Keep this tab open for auto-reminder at 5:34 PM • Built with love 💕
+        <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
+          ⚠️ Keep this tab open until 6 PM • Built with love 💕
         </div>
       </div>
     </div>
