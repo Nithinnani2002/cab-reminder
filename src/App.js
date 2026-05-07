@@ -9,7 +9,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for 3:50 PM..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 3:55 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -24,7 +24,7 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(15, 50, 0, 0); // Changed to 3:50 PM (15:50)
+      target.setHours(15, 55, 0, 0); // Changed to 3:55 PM (15:55)
       
       if (target < now) {
         setCountdown("⏰ Time passed!");
@@ -53,7 +53,7 @@ export default function App() {
       const min = now.getMinutes();
       
       // Check for 3:50 PM (15:50)
-      if (hour === 15 && min === 50) {
+      if (hour === 15 && min === 55) {
         if (slotRef.current === 0) {
           slotRef.current = 1;
           await fireReminder(0);
@@ -172,7 +172,7 @@ export default function App() {
         </div>
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
-          ⚠️ Keep this tab open until 3:50 PM • Built with love 💕
+          ⚠️ Keep this tab open until 3:55 PM • Built with love 💕
         </div>
       </div>
     </div>
