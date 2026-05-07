@@ -24,7 +24,7 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(15, 55, 0, 0); // Changed to 3:55 PM (15:55)
+      target.setHours(16, 02, 0, 0); // Changed to 4:02PM (16:02)
       
       if (target < now) {
         setCountdown("⏰ Time passed!");
@@ -37,7 +37,7 @@ export default function App() {
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today — 3:50 PM");
+      setNextSlot("Today — 16:02 PM");
     }
     
     updateCountdown();
@@ -53,7 +53,7 @@ export default function App() {
       const min = now.getMinutes();
       
       // Check for 3:50 PM (15:50)
-      if (hour === 15 && min === 55) {
+      if (hour === 16 && min === 02) {
         if (slotRef.current === 0) {
           slotRef.current = 1;
           await fireReminder(0);
