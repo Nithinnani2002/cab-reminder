@@ -9,7 +9,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for 6:00 PM..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 3:50 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -24,19 +24,22 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(18, 0, 0, 0);
+      target.setHours(15, 50, 0, 0); // Changed to 3:50 PM (15:50)
+      
       if (target < now) {
         setCountdown("⏰ Time passed!");
         setNextSlot("Reminder already fired or missed");
         return;
       }
+      
       const diff = target - now;
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today — 6:00 PM");
+      setNextSlot("Today — 3:50 PM");
     }
+    
     updateCountdown();
     const t = setInterval(updateCountdown, 1000);
     return () => clearInterval(t);
@@ -48,13 +51,16 @@ export default function App() {
       const now = new Date();
       const hour = now.getHours();
       const min = now.getMinutes();
-      if (hour === 18 && min === 0) {
+      
+      // Check for 3:50 PM (15:50)
+      if (hour === 15 && min === 50) {
         if (slotRef.current === 0) {
           slotRef.current = 1;
           await fireReminder(0);
         }
       }
     }
+    
     const t = setInterval(checkAndFire, 10000); // checks every 10 sec so it doesn't miss
     return () => clearInterval(t);
   }, [active]);
@@ -98,8 +104,14 @@ export default function App() {
   }
 
   function toggleActive() {
-    if (active) { setActive(false); addLog("🛑 Reminders STOPPED"); }
-    else { setActive(true); slotRef.current = 0; addLog("✅ Reminders ACTIVATED"); }
+    if (active) { 
+      setActive(false); 
+      addLog("🛑 Reminders STOPPED"); 
+    } else { 
+      setActive(true); 
+      slotRef.current = 0; 
+      addLog("✅ Reminders ACTIVATED"); 
+    }
   }
 
   const s = {
@@ -138,7 +150,7 @@ export default function App() {
         <div style={s.card}>
           <div style={s.label}>📅 Today's Schedule</div>
           <div style={s.row}>
-            <span style={{ color: "#fff", fontWeight: "500" }}>6:00 PM</span>
+            <span style={{ color: "#fff", fontWeight: "500" }}>3:50 PM</span>
             <span style={{ color: "#888" }}>SMS + Email 📧</span>
           </div>
           <div style={{ fontSize: "11px", color: "#444", marginTop: "10px" }}>⚠️ Keep this tab open!</div>
@@ -160,7 +172,7 @@ export default function App() {
         </div>
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
-          ⚠️ Keep this tab open until 6 PM • Built with love 💕
+          ⚠️ Keep this tab open until 3:50 PM • Built with love 💕
         </div>
       </div>
     </div>
