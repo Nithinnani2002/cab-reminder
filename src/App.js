@@ -9,7 +9,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for 3:55 PM..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 4:09 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -24,7 +24,7 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(16, 02, 0, 0); // Changed to 4:02PM (16:02)
+      target.setHours(16, 9, 0, 0); // Changed to 4:09 PM (16:09)
       
       if (target < now) {
         setCountdown("⏰ Time passed!");
@@ -37,7 +37,7 @@ export default function App() {
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today — 16:02 PM");
+      setNextSlot("Today — 4:09 PM");
     }
     
     updateCountdown();
@@ -52,8 +52,8 @@ export default function App() {
       const hour = now.getHours();
       const min = now.getMinutes();
       
-      // Check for 3:50 PM (15:50)
-      if (hour === 16 && min === 02) {
+      // Check for 4:09 PM (16:09)
+      if (hour === 16 && min === 9) {
         if (slotRef.current === 0) {
           slotRef.current = 1;
           await fireReminder(0);
@@ -150,7 +150,7 @@ export default function App() {
         <div style={s.card}>
           <div style={s.label}>📅 Today's Schedule</div>
           <div style={s.row}>
-            <span style={{ color: "#fff", fontWeight: "500" }}>3:50 PM</span>
+            <span style={{ color: "#fff", fontWeight: "500" }}>4:09 PM</span>
             <span style={{ color: "#888" }}>SMS + Email 📧</span>
           </div>
           <div style={{ fontSize: "11px", color: "#444", marginTop: "10px" }}>⚠️ Keep this tab open!</div>
@@ -172,7 +172,7 @@ export default function App() {
         </div>
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
-          ⚠️ Keep this tab open until 3:55 PM • Built with love 💕
+          ⚠️ Keep this tab open until 4:09 PM • Built with love 💕
         </div>
       </div>
     </div>
